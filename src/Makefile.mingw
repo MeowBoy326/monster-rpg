@@ -1,0 +1,66 @@
+CC=i686-w64-mingw32-g++
+
+ifdef BUILD_EDITOR
+CFLAGS=-DEDITOR
+else
+CFLAGS=-O2 -DALLEGRO_STATICLINK -static -static-libgcc -static-libstdc++ -I/home/trent/code/win-include
+endif
+
+LINKFLAGS=-static -static-libgcc -static-libstdc++ -Wl,--subsystem,windows -L/home/trent/code/win-lib
+
+SRCS=\
+	animation.cpp\
+	area.cpp\
+	battle.cpp\
+	battle_affects.cpp\
+	combatant.cpp\
+	config.cpp\
+	debug.cpp\
+	enemy_combatant.cpp\
+	graphics.cpp\
+	input.cpp\
+	io.cpp\
+	menu.cpp\
+	mode7.cpp\
+	mwidgets.cpp\
+	object.cpp\
+	player.cpp\
+	player_combatant.cpp\
+	script.cpp\
+	sound.cpp\
+	spell.cpp\
+	timer.cpp\
+	util.cpp\
+	xml.cpp\
+	awidgets.cpp\
+	tgui.cpp\
+
+LIBOBJS=$(SRCS:.cpp=.o)
+
+ALLEGROLIBS=-lalleg -luser32 -lgdi32 -lkernel32 -lddraw -ldsound -ldinput -luuid -ldxguid -lwinmm -lole32
+VORBISLIBS=-lvorbisfile -lvorbis -logg
+LIBS=-lfudgefont -lfreetype -lzlibstatic -llua5.1 -llogg $(VORBISLIBS) $(ALLEGROLIBS)
+
+default: monster
+
+monster: $(LIBOBJS) monster.o logos.h
+	i686-w64-mingw32-g++ $(LINKFLAGS) -o monster icon.res $(LIBOBJS) monster.o $(LIBS)
+
+editor: $(LIBOBJS) editor.o
+	i686-w64-mingw32-g++ -o meditor $(LIBOBJS) editor.o $(LIBS)
+
+mkanim: $(LIBOBJS) mkanim.o
+	i686-w64-mingw32-g++ -o mkanim $(LIBOBJS) mkanim.o $(LIBS)
+
+mkanimset: $(LIBOBJS) mkanimset.o
+	i686-w64-mingw32-g++ -o mkanimset $(LIBOBJS) mkanimset.o $(LIBS)
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $<
+
+clean:
+	-rm *.o
+	-rm editor
+	-rm monster
+	-rm mkanim
+	-rm mkanimset
